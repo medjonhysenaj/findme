@@ -11,13 +11,3 @@ class ApartamentApplicationTests {
 	}
 
 }
-@Component
-public class StartupCheck {
-    @Value("${spring.datasource.url}")
-    private String dbUrl;
-
-    @PostConstruct
-    public void printUrl() {
-        System.out.println("✅ DB URL in use: " + dbUrl);
-    }
-}
