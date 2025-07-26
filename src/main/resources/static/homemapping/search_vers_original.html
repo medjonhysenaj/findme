@@ -1,0 +1,252 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="thtml; charset=utf-8" />
+<link rel="stylesheet" href="leaflet2.css" />
+<link rel="stylesheet" href="leaflet-search.css" />
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="leaflet-panel-layers.css">
+<link rel="stylesheet" href="leaflet-measure.css">
+<link rel="stylesheet" href="Leaflet-BigImage.css">
+<link rel="stylesheet" href="legend.css">
+<link rel="stylesheet" href="leaflet.draw.css"/>
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+        }
+	  #foo {
+		position: fixed;
+		bottom: 0;
+		right: 0;
+		z-index: 303;
+		background-color: #ffffff;
+	  }
+    </style>
+</head>
+
+<body>
+	<div style="padding-left: 150px;z-index: 300;position: absolute;">
+		<img src="images\logo.png" width="70" height="70">
+	</div>
+	<div id="foo">Projekt nga Medjon HYSENAJ - WEB MAP GIS</div>
+	<div id="map" style="z-index: 50;">
+    </div>
+<script src="leaflet.js"></script>
+<script src="leaflet-search.js"></script>
+<script src="leaflet-search2.js"></script>
+<script src="ndertesa.js"></script>
+<script src="rruget.js"></script>
+<script src="objekte_insitucione.js"></script>
+<script src="objekte_insitucione.geojson.js"></script>
+<script src="objekte_private.js"></script>
+<script src="objekte_private.geojson.js"></script>
+<script src="leaflet-panel-layers.js"></script>
+<script src="leaflet-measure.js"></script>
+<script src="bundle.js"></script>
+<script src="Leaflet-BigImage.js"></script>
+<script src="legend.js"></script>
+
+<script>
+    var datandertesa        = ndertesa;
+    var datanivelrruge      = nivelrruge;
+    var dataobjprivate      = objprivate;
+    var dataobjinstitucione = objinstitucione;
+
+	var map = new L.Map('map', {zoom: 16, measureControl: true, center: new L.latLng(41.32922650826991, 19.817209557269628) });	//set center from first location
+
+	var tiles = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}.png', {
+		maxZoom: 18,
+		attribution: 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+	}).addTo(map);
+
+    L.control.bigImage({position: 'topright'}).addTo(map);
+
+
+/*
+	var printer = L.easyPrint({
+				tileLayer: tiles,
+				sizeModes: ['Current', 'A4Landscape', 'A4Portrait'],
+				filename: 'map',
+				exportOnly: true,
+				hideControlContainer: true
+			}).addTo(map);
+
+			function manualPrint () {
+				printer.printMap('CurrentSize', 'MyManualPrint')
+			}
+*/
+
+    const legend = L.control.Legend({
+            position: "bottomright",
+            collapsed: true,
+            symbolWidth: 24,
+            opacity: 40,
+            column: 2,
+            legends: [{
+                label: "Real line",
+                type: "polyline",
+                color: "#FF0000",
+                fillColor: "#FF0000",
+                weight: 2
+            }, {
+                label: "Dotted line",
+                type: "polyline",
+                color: "#0000FF",
+                fillColor: "#0000FF",
+                dashArray: [5, 5],
+                weight: 2
+            }, {
+                label: "Rectangle",
+                type: "rectangle",
+                color: "#FF0000",
+                fillColor: "#FF0000",
+                weight: 2
+            }, {
+                label: "Square",
+                type: "polygon",
+                sides: 4,
+                color: "#FF0000",
+                fillColor: "#FF0000",
+                weight: 2
+            }, {
+                label: "Regular triangle",
+                type: "polygon",
+                sides: 3,
+                color: "#FF0000",
+                fillColor: "#FF0000",
+                weight: 2
+            }, {
+                label: "Regular polygon",
+                type: "polygon",
+                sides: 5,
+                color: "#FF0000",
+                fillColor: "#FF0000",
+                weight: 2
+            }]
+        })
+        .addTo(map);
+
+	var rrugetLayer = new L.GeoJSON(datanivelrruge, {
+			style: function(feature) {
+				return {color: "black", weight: 1 };
+			},
+			onEachFeature: function(feature, marker) {
+				marker.bindPopup('<h4 style="color:'+feature.properties.color+'">'+ feature.properties.name +'</h4>');
+			}
+		});
+
+	var featuresLayer = new L.GeoJSON(datandertesa, {
+			style: function(feature) {
+				return {color: feature.properties.color };
+			},
+			onEachFeature: function(feature, marker) {
+				marker.bindPopup('<h4 style="color:'+feature.properties.color+'">'+ feature.properties.name +'</h4>');
+			}
+		});
+
+	var objprivateLayer = new L.GeoJSON(dataobjprivate, {
+			style: function(feature) {
+				return {color: "black", weight: 4 };
+			},
+			onEachFeature: function(feature, marker) {
+				marker.bindPopup('<h4 style="color:'+feature.properties.color+'">'+ feature.properties.name +'</h4>');
+			},
+			pointToLayer: function(feature, latlng) {
+				return new L.CircleMarker(latlng, {
+					radius:1,
+					fillOpacity: 0.85
+				});
+			}
+		});
+
+	var objinsitutcione = new L.GeoJSON(dataobjinstitucione, {
+			style: function(feature) {
+				return {color: "yellow", weight: 4 };
+			},
+			onEachFeature: function(feature, marker) {
+				marker.bindPopup('<h4 style="color:'+feature.properties.color+'">'+ feature.properties.name +'</h4>');
+			},
+			pointToLayer: function(feature, latlng) {
+				return new L.CircleMarker(latlng, {
+					radius:1,
+					fillOpacity: 0.85
+				});
+			}
+		});
+
+	////////////map.addLayer(featuresLayer);
+	////////////map.addLayer(rrugetLayer);
+	////////////map.addLayer(objprivateLayer);
+	////////////map.addLayer(objinsitutcione);
+
+	var overLayers = [
+		{
+			name: "Objekte Private",
+			layer: L.geoJson(objprivate)
+		},
+		{
+			name: "Objekte Institucione",
+			layer: L.geoJson(objinstitucione)
+		}
+	];
+
+    var panelLayers = new L.Control.PanelLayers(overLayers);
+
+    map.addControl(panelLayers);
+
+    ////////////search for rruget dhe ndertesat
+
+	var searchrruget = new L.Control.Search({
+		layer: L.featureGroup([featuresLayer, rrugetLayer]),
+		propertyName: 'name',
+		marker: false,
+		moveToLocation: function(latlng, title, map) {
+			//map.fitBounds( latlng.layer.getBounds() );
+			var zoom = map.getBoundsZoom(latlng.layer.getBounds());
+  			map.setView(latlng, zoom); // access the zoom
+		}
+	});
+
+	searchrruget.on('search:locationfound', function(e) {
+
+		//console.log('search:locationfound', );
+
+		//map.removeLayer(this._markerSearch)
+
+		e.layer.setStyle({fillColor: '#3f0', color: '#0f0'});
+		if(e.layer._popup)
+			e.layer.openPopup();
+
+	}).on('search:collapsed', function(e) {
+
+		featuresLayer.eachLayer(function(layer) {	//restore feature color
+			featuresLayer.resetStyle(layer);
+		});
+	});
+
+	map.addControl( searchrruget );  //inizialize search control
+
+    ////////////search for objekte private
+
+	L.control.search({
+		layer: L.featureGroup([objprivateLayer, objinsitutcione]),
+		initial: false,
+		propertyName: 'name',
+		buildTip: function(text, val) {
+			var type = 'test';
+			return '<a href="#" class="'+type+'">'+text+'</a>';
+		}
+	})
+	.addTo(map);
+
+</script>
+</body>
+</html>

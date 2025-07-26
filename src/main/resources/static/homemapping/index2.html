@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GIS Chatbot Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/botui/build/botui.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/botui/build/botui-theme-default.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+	<!-- Load Vue FIRST -->
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script>
+	
+	<!-- THEN load BotUI -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui.min.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui-theme-default.css" />
+	<script src="https://cdn.jsdelivr.net/npm/botui/build/botui.min.js"></script>
+    <style>
+        #map { height: 90vh; width: 100%; }
+        #bot-container { position: fixed; bottom: 0; right: 20px; width: 300px; z-index: 1000; }
+        #toggleBot { position: fixed; bottom: 10px; right: 20px; z-index: 1001; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<button id="toggleBot">💬 Le te planifikojme</button>
+<div id="bot-container" style="display:none;">
+    <div id="botui-app">
+        <bot-ui></bot-ui>
+    </div>
+</div>
+
+<script>
+    const map = L.map('map').setView([41.3275, 19.8189], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    function addMarkers(locations) {
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+                map.removeLayer(layer);
+            }
+        });
+
+        const latlngs = [];
+
+        locations.forEach((loc, idx) => {
+            const marker = L.marker([loc.lat, loc.lng]).addTo(map);
+            marker.bindPopup(`${idx+1}. ${loc.name}`).openPopup();
+            latlngs.push([loc.lat, loc.lng]);
+        });
+
+        L.polyline(latlngs, { color: 'blue' }).addTo(map);
+        map.fitBounds(latlngs);
+    }
+
+    const botui = new BotUI('botui-app');
+    const steps = [];
+
+    function startChatFlow() {
+        botui.message.add({ content: 'Përshëndetje! Mund të të ndihmoj të ndërtosh një itinerar udhëtimi. Ku dëshiron të shkosh më parë?' })
+        .then(() => botui.action.text({ action: { placeholder: 'p.sh., nje muze apo lokal' } }))
+        .then(res1 => {
+            steps.push(res1.value);
+            return botui.message.add({ content: 'Zgjedhje e mirë! Dhe çfarë do të dëshironit të bënit më pas?' });
+        })
+        .then(() => botui.action.text({ action: { placeholder: 'e.g., have lunch' } }))
+        .then(res2 => {
+            steps.push(res2.value);
+            return botui.message.add({ content: 'Një ndalesë më shumë?' });
+        })
+        .then(() => botui.action.text({ action: { placeholder: 'e.g., relax in a park' } }))
+        .then(res3 => {
+            steps.push(res3.value);
+            return fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: steps.join(', then ') })
+            });
+        })
+        .then(res => res.json())
+        .then(data => {
+            botui.message.add({ content: 'Got it! Building your route now...' });
+            // Simulate markers (replace with real POIs from backend later)
+            addMarkers([
+                { name: steps[0], lat: 41.3275, lng: 19.8189 },
+                { name: steps[1], lat: 41.3251, lng: 19.8204 },
+                { name: steps[2], lat: 41.3243, lng: 19.8162 }
+            ]);
+        });
+    }
+
+    document.getElementById('toggleBot').addEventListener('click', () => {
+        const botContainer = document.getElementById('bot-container');
+        const wasHidden = botContainer.style.display === 'none';
+
+        botContainer.style.display = wasHidden ? 'block' : 'none';
+
+        if (wasHidden) {
+            steps.length = 0;
+            botui.message.add({ content: 'Përshëndetje përsëri! Le të planifikojmë itinerarin tënd.' }).then(startChatFlow);
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Leaflet ZoomBar Demo</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <!-- Implementation: Include ZoomBar.css after including leaflet.css -->
+        <!-- <link rel="stylesheet" type="text/css" href="https://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css"/> -->
+<link rel="stylesheet" href="leaflet2.css" />
+<link rel="stylesheet" href="L.Control.ZoomBar.css"/>
+<link rel="stylesheet" href="leaflet-search.css" />
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="leaflet-panel-layers.css">
+<link rel="stylesheet" href="leaflet-measure.css">
+<link rel="stylesheet" href="Leaflet-BigImage.css">
+<link rel="stylesheet" href="legend.css">
+<link rel="stylesheet" href="leaflet.draw.css"/>
+<link rel="stylesheet" href="icons.css"/>
+
+        <!-- Implementation: Include ZoomBar.js after including leaflet.js -->
+        <!-- <script type="text/javascript" src="https://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script> -->
+<script src="leaflet.js"></script>
+<script src="L.Control.ZoomBar.js"></script>
+<script src="leaflet-search.js"></script>
+<script src="leaflet-search2.js"></script>
+<script src="ndertesa.js"></script>
+<script src="rruget.js"></script>
+<script src="objekte_insitucione.js"></script>
+<script src="objekte_insitucione.geojson.js"></script>
+<script src="objekte_private.js"></script>
+<script src="objekte_private.geojson.js"></script>
+<script src="leaflet-panel-layers.js"></script>
+<script src="leaflet-measure.js"></script>
+<script src="bundle.js"></script>
+<script src="Leaflet-BigImage.js"></script>
+<script src="legend.js"></script>
+<script src="Leaflet.draw.js"></script>
+<script src="Tooltip.js"></script>
+<script src="Leaflet.Draw.Event.js"></script>
+<script src="Control.Draw.js"></script>
+
+        <style>
+            #map {
+                height: 600px;
+                width: 800px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script type="text/javascript">
+
+            // Implementation: Set native zoomControl option to false!
+            //                 ZoomBar uses the initial map view as the home position.
+            //
+            var map = L.map('map').setView([34.00, -81.035], 14);
+
+            // Implementation: Instantiate a ZoomBar control in its place.
+            //
+            var zoom_bar = new L.Control.ZoomBar({position: 'topright'}).addTo(map);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        </script>
+    </body>
+</html>

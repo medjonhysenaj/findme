@@ -1,0 +1,110 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet easyPrint plugin Demo</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+
+</head>
+
+<body class="easyPrint">
+	<h2>Welcome to the Leaflet easyPrint demo</h2>
+	<p>All this text will be hidden when I print my map.</p>
+	<div id="map" style="height:400px; width:900px"></div>
+	<script src="leaflet.js"></script>
+    <script src="rruget.js"></script>
+    <script src="ndertesa.js"></script>
+    <script src="objekte_private.js"></script>
+
+	<script src="bundle.js"></script>
+
+	<script>
+
+		var map = L.map('map').setView([41.32922650826991, 19.817209557269628], 13);
+        var datanivelrruge      = nivelrruge;
+        var datandertesa        = ndertesa;
+        var dataobjprivate      = objprivate;
+
+		var tiles = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}.png', {
+			maxZoom: 18,
+			attribution: 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+		}).addTo(map);
+
+		L.marker([41.32922650826991, 19.817209557269628]).addTo(map)
+		.bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
+
+		L.circle([41.32922650826991, 19.817209557269628], 500, {
+			color: 'red',
+			fillColor: '#f03',
+			fillOpacity: 0.5
+		}).addTo(map).bindPopup("I am a circle.");
+
+		L.polygon([
+			[51.509, -0.08],
+			[51.503, -0.06],
+			[51.51, -0.047]
+			]).addTo(map).bindPopup("I am a polygon.");
+
+	var rrugetLayer = new L.GeoJSON(datanivelrruge, {
+			style: function(feature) {
+				return {color: "black", weight: 1 };
+			},
+			onEachFeature: function(feature, marker) {
+				marker.bindPopup('<h4 style="color:'+feature.properties.color+'">'+ feature.properties.name +'</h4>');
+			}
+		});
+        map.addLayer(rrugetLayer);
+
+	var featuresLayer = new L.GeoJSON(datandertesa, {
+			style: function(feature) {
+				return {color: feature.properties.color };
+			},
+			onEachFeature: function(feature, marker) {
+				marker.bindPopup('<h4 style="color:'+feature.properties.color+'">'+ feature.properties.name +'</h4>');
+			}
+		});
+         map.addLayer(featuresLayer);
+
+	var objprivateLayer = new L.GeoJSON(dataobjprivate, {
+			style: function(feature) {
+				return {color: "black", weight: 4 };
+			},
+			onEachFeature: function(feature, marker) {
+				marker.bindPopup('<h4 style="color:'+feature.properties.color+'">'+ feature.properties.name +'</h4>');
+			},
+			pointToLayer: function(feature, latlng) {
+				return new L.CircleMarker(latlng, {
+					radius:1,
+					fillOpacity: 0.85
+				});
+			}
+		});
+		map.addLayer(objprivateLayer);
+
+		var popup = L.popup();
+
+
+		var printer = L.easyPrint({
+      		tileLayer: tiles,
+      		sizeModes: ['Current', 'A4Landscape', 'A4Portrait'],
+      		filename: 'myMap',
+      		exportOnly: true,
+      		hideControlContainer: true
+		}).addTo(map);
+
+		function manualPrint () {
+			printer.printMap('CurrentSize', 'MyManualPrint');
+		}
+
+	</script>
+	<p class="testing">So will this boring sentence.</p>
+	<br><br>
+	<a href="https://github.com/rowanwins/leaflet-easyPrint"><button class="gitButton"><i class="fa fa-github fa-lg"></i>&nbsp;&nbsp;  Download me on github</button></a>
+	<button class="manualButton" onclick="manualPrint()">Manual print</button>
+
+</body>
+
+</html>

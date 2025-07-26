@@ -1,0 +1,157 @@
+<body>
+  <div class="full-screen">
+    <div class="head">
+      <div class="upleft">
+        <span style="color: #ffffff">Prime </span><span style="color: #000000">Map</span>
+      </div>
+      <div class="upcenter"></div>
+      <div class="upright" onclick="toggleUprightBackground()">
+        <span style="color: #ffffff">Map & Tools</span>
+        <img src="maptool.png" alt="Map & Tools">
+        <div class="dropdown-content">
+          <a href="#" onclick="openLayersTool()"><img src="layers.png" alt="Map & Tools"> Layers Tool</a>
+          <div class="slide-in-div" id="layersToolDiv">
+            <div class="header">
+              <a href="#" onclick="toggleAdminPanel()" style="color:white; font-weight:bold; margin-left: 20px;">Admin</a>
+              <div class="map-tools"><span>Map & Tools</span></div>
+              <div class="close-btn" onclick="closeLayersTool()">X</div>
+            </div>
+            <div class="layers-content">
+              <div class="vertical-menu" id="dynamicMenu"></div>
+            </div>
+          </div>
+          <a href="#" onclick="opensearchTool()"><img src="search.png" alt="Map & Tools"> Search Tool</a>
+          <div class="slide-in-div" id="searchToolDiv">
+            <div class="header">
+              <div class="map-tools"><span>Search Tool</span></div>
+              <div class="close-btn" onclick="closesearchTool()">X</div>
+            </div>
+            <div class="layers-content">
+              <div id="geocoder-container">
+                <select id="geocoder" onchange="changeMapCenter(this)">
+                  <option value="">-- Perzgjidhni vendndodhjen --</option>
+                  <option value="41.32967706646486, 19.81661775374059">Tirane</option>
+                  <option value="42.067634608672, 19.511931661415602">Shkoder</option>
+                  <option value="40.616757686402366, 20.78121887765428">Korce</option>
+                  <option value="41.8781,-87.6298">Vlore</option>
+                  <option value="41.8781,-87.6298">Fier</option>
+                  <option value="41.8781,-87.6298">Elbasan</option>
+                </select>
+              </div>
+              <div id="firstlevel-container">
+                <select id="firstlevel" onchange="populateSecondLevel()">
+                  <option value="">-- Perzgjidhni Kategorine --</option>
+                  <option value="Accomodation">Accomodation</option>
+                  <option value="Food&Drink">Food&Drink</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Outdoor">Outdoor</option>
+                </select>
+              </div>
+              <div id="secondlevel-container">
+                <select id="secondlevel" onchange="toggleCategory(this.value)">
+                  <option value="">-- Perzgjidhni Nen Kategorine --</option>
+                </select>
+              </div>
+              <div id="resultsList" class="results-list">
+                <h3>Rezultatet e Kerkimit</h3>
+                <ul id="resultsUl"></ul>
+              </div>
+            </div>
+          </div>
+          <a href="#" id="mapToolsLink"><img src="tool.jpg" alt="Map & Tools"> Map Tools</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container for map and right panel -->
+    <div style="display: flex; flex-direction: row;">
+      <!-- Left side (map + table) -->
+      <div style="flex: 1; display: flex; flex-direction: column;">
+        <div class="map" id="map" style="height: 500px;">
+          <!-- Leaflet map goes here -->
+        </div>
+        <div class="places-container" style="overflow-x: auto; overflow-y: auto; max-height: 400px; padding: 10px; margin-top: 20px; background-color: white;">
+          <h3>Manage Places</h3>
+          <table id="placeTable" class="display" style="width:100%">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Group ID</th>
+                <th>Image</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right side (admin panel) -->
+      <div id="adminPanelDiv" style="width: 350px; background-color: #fff; padding: 20px; border-left: 1px solid #ccc; overflow-y: auto; max-height: 100vh;">
+        <div class="header">
+          <span class="map-tools">Admin Panel</span>
+          <div class="close-btn" onclick="toggleAdminPanel()">X</div>
+        </div>
+
+        <div class="admin-section">
+          <h3>Manage Categories</h3>
+          <input type="text" id="newCategory" placeholder="New Category Name" style="width:100%; margin-bottom:10px;" />
+          <button onclick="addCategory()" class="btn btn-success" style="width:100%; margin-bottom:15px;">Add</button>
+          <select id="categoryList" onchange="populateCategoryEdit(this.value)">
+            <option value="">Select Category</option>
+          </select>
+          <input type="hidden" id="categoryId">
+          <input type="text" id="editCategory" placeholder="Edit Category Name" />
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button onclick="updateCategory()" class="btn btn-warning" style="flex: 1;">Update</button>
+            <button onclick="deleteCategory()" class="btn btn-danger" style="flex: 1;">Delete</button>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 8px;">Manage Groups</h3>
+        <input type="text" id="newGroupName" placeholder="Group Name" style="width:100%; margin-bottom:10px;">
+        <select id="categorySelect" style="width:100%; margin-bottom:10px;">
+          <option value="">Select Category</option>
+        </select>
+        <label for="placeIcon" style="font-size: small;">Upload Icon:</label>
+        <input type="file" id="groupIcon" style="width:100%; margin-bottom:15px;">
+        <button onclick="addGroup()" style="width:100%; margin-bottom:15px;" class="btn btn-success">Add Group</button>
+
+        <select id="groupList" onchange="populateGroupEdit(this.value)" style="width:100%; margin-bottom:10px;">
+          <option value="">Select Group</option>
+        </select>
+        <input type="hidden" id="groupId">
+        <input type="text" id="editGroupName" placeholder="Edit Group Name" style="width:100%; margin-bottom:10px;">
+        <select id="editGroupCategory" style="width:100%; margin-bottom:10px;">
+          <option value="">Select Category</option>
+        </select>
+        <div style="display: flex; gap: 10px;">
+          <button onclick="updateGroup()" class="btn btn-warning" style="flex: 1;">Update</button>
+          <button onclick="deleteGroup()" class="btn btn-danger" style="flex: 1;">Delete</button>
+        </div>
+
+        <h3 style="margin-top: 20px;">Add Place</h3>
+        <input type="text" id="placeName" name="name" placeholder="Place Name" style="width:100%; margin-bottom:10px;">
+        <textarea id="placeDescription" name="description" placeholder="Enter a description" style="width:100%; margin-bottom:10px;"></textarea>
+        <input type="text" id="placeLatitude" name="latitude" placeholder="Latitude" style="width:100%; margin-bottom:10px;">
+        <input type="text" id="placeLongitude" name="longitude" placeholder="Longitude" style="width:100%; margin-bottom:10px;">
+        <button onclick="enableCoordinatePicker()" style="width:100%; margin-bottom:10px;">📍 Pick on Map</button>
+        <select id="groupSelect" name="group" style="width:100%; margin-bottom:10px;">
+          <option value="">Select Group</option>
+        </select>
+        <label for="placeImage" style="font-size: small;">Upload Image:</label>
+        <input type="file" id="placeImage" name="placeImage" style="width:100%; margin-bottom:10px;">
+        <button onclick="addPlace()" style="width:100%;" class="btn btn-success">Add Place</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div id="scale-bar"></div>
+      <input type="text" id="coordinates" class="coordinates" readonly>
+      <div class="powered">Powered by Prime MAP</div>
+    </div>
+  </div>
+</body>

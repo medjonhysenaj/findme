@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Draw and Measure Controls in Collapsed Menu</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-measure/dist/leaflet-measure.css" />
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+
+        #menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #collapsedMenu {
+            display: none;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: white;
+            border-radius: 4px;
+        }
+
+        #toggleMenuBtn {
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+    <div id="menu">
+        <div id="toggleMenuBtn">Toggle Menu</div>
+        <div id="collapsedMenu">
+            <h4>Controls</h4>
+            <label><input type="checkbox" id="drawControlCheckbox"> Toggle Draw Control</label><br>
+            <label><input type="checkbox" id="measureControlCheckbox"> Toggle Measure Control</label>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+    <script src="https://unpkg.com/leaflet-measure/dist/leaflet-measure.js"></script>
+
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Create control layers
+        var drawControl = new L.Control.Draw({
+            draw: {
+                polygon: true,
+                polyline: true,
+                rectangle: true,
+                circle: true,
+                marker: true
+            },
+            edit: {
+                featureGroup: new L.FeatureGroup()
+            }
+        });
+
+        var measureControl = new L.Control.Measure({
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'acres'
+        });
+
+        // Add controls to the map
+        drawControl.addTo(map);
+        measureControl.addTo(map);
+
+        // Toggle collapsed menu visibility
+        var collapsedMenu = document.getElementById('collapsedMenu');
+        var toggleMenuBtn = document.getElementById('toggleMenuBtn');
+        toggleMenuBtn.addEventListener('click', function () {
+            if (collapsedMenu.style.display === 'block') {
+                collapsedMenu.style.display = 'none';
+            } else {
+                collapsedMenu.style.display = 'block';
+            }
+        });
+
+        // Handle control visibility based on checkbox state
+        var drawControlCheckbox = document.getElementById('drawControlCheckbox');
+        drawControlCheckbox.addEventListener('change', function () {
+            if (drawControlCheckbox.checked) {
+                map.addControl(drawControl);
+            } else {
+                map.removeControl(drawControl);
+            }
+        });
+
+        var measureControlCheckbox = document.getElementById('measureControlCheckbox');
+        measureControlCheckbox.addEventListener('change', function () {
+            if (measureControlCheckbox.checked) {
+                map.addControl(measureControl);
+            } else {
+                map.removeControl(measureControl);
+            }
+        });
+    </script>
+</body>
+</html>
