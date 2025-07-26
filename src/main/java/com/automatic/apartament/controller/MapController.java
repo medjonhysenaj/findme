@@ -48,10 +48,18 @@ public class MapController {
     
     // ====== CATEGORIES ======
 
-    @GetMapping("/categories")
-    public List<Categories> getCategories() {
-        return apartmentService.getAllCategories();
+@GetMapping("/categories")
+public ResponseEntity<?> getCategories() {
+    List<Categories> list = apartmentService.getAllCategories();
+
+    if (list == null || list.isEmpty()) {
+        System.out.println("⚠️ No categories found");
+        return ResponseEntity.ok(List.of()); // send empty JSON array
     }
+
+    System.out.println("✅ Categories found: " + list.size());
+    return ResponseEntity.ok(list);
+}
 
     @GetMapping("/places")
     public List<Place> getAllPlaces() {
